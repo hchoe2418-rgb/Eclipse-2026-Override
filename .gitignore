@@ -16,18 +16,3 @@ temp.errors
 *.ini
 .d/
 
-# PROS Build and Binary Directories
-bin/
-firmware/
-.vscode/
-build/
-
-# Compiled Objects
-*.o
-*.d
-*.elf
-*.bin
-
-# OS specific files
-.DS_Store
-Thumbs.db
