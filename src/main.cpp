@@ -22,7 +22,7 @@ ez::Drive chassis(
 // - `4.0` is the distance from the center of the wheel to the center of the robot
 // ez::tracking_wheel horiz_tracker(8, 2.75, 4.0);  // This tracking wheel is perpendicular to the drive wheels
 // ez::tracking_wheel vert_tracker(9, 2.75, 4.0);   // This tracking wheel is parallel to the drive wheels
-pros::Motor lift(20);
+pros::Motor lift(10);
 pros::ADIDigitalOut claw('H');
 
 
@@ -285,7 +285,7 @@ void opcontrol() {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
 
-    chassis.opcontrol_arcade_standard(ez::SINGLE);  // Arcade control
+    chassis.opcontrol_arcade_standard(ez::SPLIT);  // Arcade control
     // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
     // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
     // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
