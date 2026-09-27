@@ -312,11 +312,11 @@ void opcontrol() {
     // . . .
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
       lift1.move(-127);
-      lift2.move(-127);
+      lift2.move(127);
     }
     else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
       lift1.move(127);
-      lift2.move(127);
+      lift2.move(-127);
     }
     else {
       lift1.move(0);
