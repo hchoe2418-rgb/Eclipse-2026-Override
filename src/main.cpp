@@ -309,10 +309,10 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
-      lift.move(127);
-    }
-    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
       lift.move(-127);
+    }
+    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+      lift.move(127);
     }
     else {
       lift.move(0);
