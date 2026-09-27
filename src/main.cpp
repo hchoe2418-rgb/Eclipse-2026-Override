@@ -8,10 +8,10 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {1, 2, 3},     // Left Chassis Ports (negative port will reverse it!)
-    {-4, -5, -6},  // Right Chassis Ports (negative port will reverse it!)
+    {7, 3},     // Left Chassis Ports (negative port will reverse it!)
+    {9, 11},  // Right Chassis Ports (negative port will reverse it!)
 
-    7,      // IMU Port
+    2,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     450);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
@@ -69,7 +69,7 @@ void initialize() {
       Auton("Autonomous 1\nDoes Something", testauton);
   });
   */
-
+  /*
   ez::as::auton_selector.selected_auton_print(); 
   pros::lcd::register_btn0_cb(ez::as::page_down);
   pros::lcd::register_btn2_cb(ez::as::page_up);
@@ -80,7 +80,8 @@ void initialize() {
   printf("Enabled? %i\n", ez::as::enabled()); // Returns false
   ez::as::initialize();
   printf("Enabled? %i\n", ez::as::enabled()); // Returns true
-  
+  */
+
   // Autonomous Selector using LLEMU
   /*
   ez::as::auton_selector.autons_add({
