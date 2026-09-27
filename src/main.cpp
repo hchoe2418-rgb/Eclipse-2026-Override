@@ -284,11 +284,8 @@ void opcontrol() {
   while (true) {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
-    printf("LY: %d | RX: %d\n",
-           master.get_analog(ANALOG_LEFT_Y),
-           master.get_analog(ANALOG_RIGHT_X));
 
-    chassis.opcontrol_arcade_flipped(ez::SPLIT);  // Arcade control
+    chassis.opcontrol_arcade_standard(ez::SPLIT);  // Arcade control
     // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
     // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
     // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
@@ -312,10 +309,10 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
     if (master.get_digital(DIGITAL_UP)) {
-      lift.move(33);
+      lift.move(127);
     }
     else if (master.get_digital(DIGITAL_DOWN)) {
-      lift.move(-33);
+      lift.move(-127);
     }
     else {
       lift.move(0);
