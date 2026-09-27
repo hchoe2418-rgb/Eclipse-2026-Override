@@ -12,8 +12,8 @@ ez::Drive chassis(
     {-4, -5, -6},  // Right Chassis Ports (negative port will reverse it!)
 
     7,      // IMU Port
-    4.125,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
-    343);   // Wheel RPM = cartridge * (motor gear / wheel gear)
+    3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
+    450);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
 // Uncomment the trackers you're using here!
 // - `8` and `9` are smart ports (making these negative will reverse the sensor)
@@ -22,6 +22,10 @@ ez::Drive chassis(
 // - `4.0` is the distance from the center of the wheel to the center of the robot
 // ez::tracking_wheel horiz_tracker(8, 2.75, 4.0);  // This tracking wheel is perpendicular to the drive wheels
 // ez::tracking_wheel vert_tracker(9, 2.75, 4.0);   // This tracking wheel is parallel to the drive wheels
+pros::Motor lift(20);
+pros::adi::Pneumatics claw('H');
+
+
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -29,6 +33,9 @@ ez::Drive chassis(
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+
+pros::Controller master(pros::E_CONTROLLER_MASTER);
+
 void initialize() {
   // Print our branding over your terminal :D
   ez::ez_template_print();
@@ -56,7 +63,26 @@ void initialize() {
   // chassis.opcontrol_curve_buttons_left_set(pros::E_CONTROLLER_DIGITAL_LEFT, pros::E_CONTROLLER_DIGITAL_RIGHT);  // If using tank, only the left side is used.
   // chassis.opcontrol_curve_buttons_right_set(pros::E_CONTROLLER_DIGITAL_Y, pros::E_CONTROLLER_DIGITAL_A);
 
+  //REAL AUTONS HERE
+  /*
+  ez::as::auton_selector.autons_add({
+      Auton("Autonomous 1\nDoes Something", testauton);
+  });
+  */
+
+  ez::as::auton_selector.selected_auton_print(); 
+  pros::lcd::register_btn0_cb(ez::as::page_down);
+  pros::lcd::register_btn2_cb(ez::as::page_up);
+  //Auton("Autonomous 3\nDoes Something More", auto3),
+  // These are already defaulted to these buttons, but you can change the left/right curve buttons here!
+  // chassis.opcontrol_curve_buttons_left_set(pros::E_CONTROLLER_DIGITAL_LEFT, pros::E_CONTROLLER_DIGITAL_RIGHT);  // If using tank, only the left side is used.
+  // chassis.opcontrol_curve_buttons_right_set(pros::E_CONTROLLER_DIGITAL_Y, pros::E_CONTROLLER_DIGITAL_A);
+  printf("Enabled? %i\n", ez::as::enabled()); // Returns false
+  ez::as::initialize();
+  printf("Enabled? %i\n", ez::as::enabled()); // Returns true
+  
   // Autonomous Selector using LLEMU
+  /*
   ez::as::auton_selector.autons_add({
       {"Drive\n\nDrive forward and come back", drive_example},
       {"Turn\n\nTurn 3 times.", turn_example},
@@ -73,7 +99,8 @@ void initialize() {
       {"Boomerang Pure Pursuit\n\nGo to (0, 24, 45) on the way to (24, 24) then come back to (0, 0, 0)", odom_boomerang_injected_pure_pursuit_example},
       {"Measure Offsets\n\nThis will turn the robot a bunch of times and calculate your offsets for your tracking wheels.", measure_offsets},
   });
-
+`*/
+  
   // Initialize chassis and auton selector
   chassis.initialize();
   ez::as::initialize();
@@ -119,6 +146,7 @@ void autonomous() {
   chassis.drive_sensor_reset();               // Reset drive sensors to 0
   chassis.odom_xyt_set(0_in, 0_in, 0_deg);    // Set the current position, you can start at a specific position with this
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
+
 
   /*
   Odometry and Pure Pursuit are not magic
@@ -188,6 +216,7 @@ void ez_screen_task() {
 }
 pros::Task ezScreenTask(ez_screen_task);
 
+
 /**
  * Gives you some extras to run in your opcontrol:
  * - run your autonomous routine in opcontrol by pressing DOWN and B
@@ -241,22 +270,181 @@ void ez_template_extras() {
  */
 void opcontrol() {
   // This is preference to what you like to drive on
+  bool claw_open = false;
+
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
+  uint32_t start_time = pros::millis();
+  
+  chassis.opcontrol_joystick_practicemode_toggle(false);
+  chassis.pid_tuner_enable();
+  chassis.pid_tuner_print_brain_set(true);
+  chassis.pid_tuner_print_terminal_set(true);
 
   while (true) {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
 
-    chassis.opcontrol_tank();  // Tank control
+    chassis.opcontrol_arcade_standard(ez::SPLIT);  // Tank control
     // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
     // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
     // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
     // chassis.opcontrol_arcade_flipped(ez::SINGLE);   // Flipped single arcade
 
+  // PID tuner code
+
+    if (!pros::competition::is_connected()) { 
+      // Enable / Disable PID Tuner
+      if (master.get_digital_new_press(DIGITAL_X)) 
+        chassis.pid_tuner_toggle();
+        
+      // Trigger the selected autonomous routine
+      if (master.get_digital_new_press(DIGITAL_B)) 
+        autonomous();
+
+      chassis.pid_tuner_iterate(); // Allow PID Tuner to iterate
+    } 
+
     // . . .
     // Put more user control code here!
     // . . .
+    if (master.get_digital(DIGITAL_UP)) {
+      lift.move_velocity(33);
+    }
+    else if (master.get_digital(DIGITAL_DOWN)) {
+      lift.move_velocity(-33);
+    }
+    else {
+      lift.move_velocity(0);
+      lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    }
+    pros::delay(20);
 
+
+    if (master.get_digital_new_press(DIGITAL_R1)) {
+      claw_open = !claw_open;
+      claw.set_value(claw_open);
+    }
+
+    pros::delay(20);
+
+    /*
+    //1 minute and 45 seconds total = 105,000 milliseconds
+    uint32_t elapsed = pros::millis() - start_time;
+
+    if (elapsed > 85000) { //final 20 seconds of match
+      master.print(0, 0, "ENDGAME");
+      //add something to cap speed maybe
+    }
+    */
+    
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
 }
+
+/*
+Macro idea from AI (I think it's ok)
+
+enum MacroState { IDLE, DEPOSITING, RELEASING, RESETTING };
+MacroState current_macro_state = IDLE;
+
+// Global tracker for stack layers (0 = Floor, 1 = Layer One, 2 = Layer Two, etc.)
+int stack_layer = 0; 
+
+// Lookup array or formula for your arm encoder targets per layer
+// Adjust these numbers based on physical testing with Override Pins/Cups
+const int LAYER_HEIGHTS[] = { 150, 300, 450, 600, 750 }; 
+const int MAX_LAYERS = 5;
+
+void dynamic_macro_task(void* param) {
+    uint32_t start_time = pros::millis();
+    bool command_sent = false; // Prevents motor command spamming
+    
+    while (true) {
+        int dynamic_target = LAYER_HEIGHTS[stack_layer];
+
+        switch (current_macro_state) {
+            case IDLE:
+                command_sent = false; // Reset toggle for next launch
+                break;
+                
+            case DEPOSITING:
+                // Send the move command EXACTLY ONCE when entering this state
+                if (!command_sent) {
+                    arm_motor.move_absolute(dynamic_target, 100);
+                    command_sent = true; 
+                }
+                
+                // Keep checking the encoder until it reaches the target window
+                if (std::abs(arm_motor.get_position() - dynamic_target) < 10) {
+                    start_time = pros::millis(); // Reset timer for pneumatic delay
+                    command_sent = false;        // Reset toggle for next state
+                    current_macro_state = RELEASING;
+                }
+                break;
+                
+            case RELEASING:
+                claw_pneumatic.set_value(true);
+                
+                // Wait 150ms for air pressure to clear the physical stack
+                if (pros::millis() - start_time > 150) {
+                    current_macro_state = RESETTING;
+                }
+                break;
+                
+            case RESETTING:
+                if (!command_sent) {
+                    int clear_height = dynamic_target + 80; // Small upward pop
+                    arm_motor.move_absolute(clear_height, 100);
+                    command_sent = true;
+                }
+                
+                int clear_height = dynamic_target + 80;
+                if (std::abs(arm_motor.get_position() - clear_height) < 15) {
+                    claw_pneumatic.set_value(false); // Close claw for next intake
+                    
+                    // Auto-increment to the next stack layer list index
+                    if (stack_layer < MAX_LAYERS - 1) {
+                        stack_layer++; 
+                    }
+                    
+                    current_macro_state = IDLE; // Successfully completed!
+                }
+                break;
+        }
+        pros::delay(20); // Safeguards the processor from locking up
+    }
+}    
+
+void opcontrol() {
+    while (true) {
+        // Standard EZ-Template drive setup
+        chassis.set_tank(master.get_analog(ANALOG_LEFT_Y), master.get_analog(ANALOG_RIGHT_Y));
+
+        // TRIGGER THE MACRO
+        if (master.get_digital_new_press(DIGITAL_R1) && current_macro_state == IDLE) {
+            current_macro_state = DEPOSITING;
+        }
+
+        // MANUAL HEIGHT ADJUSTMENT (Overriding the auto-increment)
+        if (master.get_digital_new_press(DIGITAL_UP)) {
+            if (stack_layer < MAX_LAYERS - 1) stack_layer++;
+            master.rumble("."); // Give physical vibration feedback to the driver
+        }
+        if (master.get_digital_new_press(DIGITAL_DOWN)) {
+            if (stack_layer > 0) stack_layer--;
+            master.rumble("-"); // Different rumble pattern for down
+        }
+        
+        // RESET BUTTON (If you back away and start a completely new stack on the floor)
+        if (master.get_digital_new_press(DIGITAL_X)) {
+            stack_layer = 0;
+            arm_motor.move_absolute(0, 90); // Bring arm back to zero
+        }
+
+        // Standard driver manual arm overrides go here...
+        pros::delay(EZ_TEMPLATE_LOOP_DELAY);
+    }
+}
+
+
+*/
