@@ -284,7 +284,10 @@ void opcontrol() {
   while (true) {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
-
+    printf("LY: %d | RX: %d\n",
+           master.get_analog(ANALOG_LEFT_Y),
+           master.get_analog(ANALOG_RIGHT_X));
+           
     chassis.opcontrol_arcade_standard(ez::SPLIT);  // Arcade control
     // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
     // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
