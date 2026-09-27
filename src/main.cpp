@@ -22,7 +22,8 @@ ez::Drive chassis(
 // - `4.0` is the distance from the center of the wheel to the center of the robot
 // ez::tracking_wheel horiz_tracker(8, 2.75, 4.0);  // This tracking wheel is perpendicular to the drive wheels
 // ez::tracking_wheel vert_tracker(9, 2.75, 4.0);   // This tracking wheel is parallel to the drive wheels
-pros::Motor lift(10);
+pros::Motor lift1(10);
+pros::Motor lift2(3)
 pros::ADIDigitalOut claw('H');
 
 
@@ -276,6 +277,7 @@ void opcontrol() {
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
   uint32_t start_time = pros::millis();
   
+  
   chassis.opcontrol_joystick_practicemode_toggle(false);
   chassis.pid_tuner_enable();
   chassis.pid_tuner_print_brain_set(true);
@@ -309,14 +311,18 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
-      lift.move_velocity(-127);
+      lift1.move(-127);
+      lift2.move(-127);
     }
     else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-      lift.move_velocity(127);
+      lift1.move(127);
+      lift2.move(127);
     }
     else {
-      lift.move_velocity(0);
-      lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+      lift1.move(0);
+      lift1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+      lift2.move(0);
+      lift2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     }
     pros::delay(20);
 
