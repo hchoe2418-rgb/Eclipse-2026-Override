@@ -287,8 +287,8 @@ void opcontrol() {
     printf("LY: %d | RX: %d\n",
            master.get_analog(ANALOG_LEFT_Y),
            master.get_analog(ANALOG_RIGHT_X));
-           
-    chassis.opcontrol_arcade_standard(ez::SPLIT);  // Arcade control
+
+    chassis.opcontrol_arcade_flipped(ez::SPLIT);  // Arcade control
     // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
     // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
     // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
@@ -312,13 +312,13 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
     if (master.get_digital(DIGITAL_UP)) {
-      lift.move_velocity(33);
+      lift.move(33);
     }
     else if (master.get_digital(DIGITAL_DOWN)) {
-      lift.move_velocity(-33);
+      lift.move(-33);
     }
     else {
-      lift.move_velocity(0);
+      lift.move(0);
       lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     }
     pros::delay(20);
