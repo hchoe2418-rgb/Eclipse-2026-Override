@@ -8,8 +8,8 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {7, 3},     // Left Chassis Ports (negative port will reverse it!)
-    {-9, -11},  // Right Chassis Ports (negative port will reverse it!)
+    {-9,-11},// Left Chassis Ports (negative port will reverse it!)
+    {7, 3},  // Right Chassis Ports (negative port will reverse it!)
 
     1,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
@@ -23,9 +23,10 @@ ez::Drive chassis(
 // ez::tracking_wheel horiz_tracker(8, 2.75, 4.0);  // This tracking wheel is perpendicular to the drive wheels
 // ez::tracking_wheel vert_tracker(9, 2.75, 4.0);   // This tracking wheel is parallel to the drive wheels
 
-pros::Motor lift1(10);
-pros::Motor lift2(-9);
-//pros::adi::Pneumatics claw('H');
+pros::MotorGroup lift ({10, -9});
+//pros::Motor lift1(10);
+// pros::Motor lift2(-9);
+pros::adi::DigitalOut claw('A');
 
 
 /**
@@ -311,29 +312,25 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
-      lift1.move(-124);
-      lift2.move(-127);
+      lift.move(-100);
     }
     else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-      lift1.move(124);
-      lift2.move(127);
+      lift.move(100);
     }
     else {
-      lift1.move(0);
-      lift1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-      lift2.move(0);
-      lift2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+      lift.move(0);
+      lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     }
     pros::delay(20);
 
-/*
+
     if (master.get_digital_new_press(DIGITAL_R1)) {
       claw_open = !claw_open;
       claw.set_value(claw_open);
     }
 
     pros::delay(20);
-*/
+
     /*
     //1 minute and 45 seconds total = 105,000 milliseconds
     uint32_t elapsed = pros::millis() - start_time;
@@ -361,6 +358,7 @@ int stack_layer = 0;
 // Adjust these numbers based on physical testing with Override Pins/Cups
 const int LAYER_HEIGHTS[] = { 150, 300, 450, 600, 750 }; 
 const int MAX_LAYERS = 5;
+
 
 void dynamic_macro_task(void* param) {
     uint32_t start_time = pros::millis();
