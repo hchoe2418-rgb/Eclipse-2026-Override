@@ -24,7 +24,7 @@ ez::Drive chassis(
 // ez::tracking_wheel vert_tracker(9, 2.75, 4.0);   // This tracking wheel is parallel to the drive wheels
 
 pros::MotorGroup lift ({10, -9});
-pros::adi::DigitalOut claw(1);
+pros::adi::DigitalOut claw('A');
 
 
 /**
