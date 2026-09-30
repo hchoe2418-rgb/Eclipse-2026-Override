@@ -321,7 +321,6 @@ void opcontrol() {
       lift.move(0);
       lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     }
-    pros::delay(20);
 
 
     if (master.get_digital_new_press(DIGITAL_R1)) {
