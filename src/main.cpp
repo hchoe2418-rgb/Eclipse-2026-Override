@@ -269,9 +269,10 @@ void ez_template_extras() {
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+bool claw_open = false;
+
 void opcontrol() {
   // This is preference to what you like to drive on
-  bool claw_open = false;
 
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
   uint32_t start_time = pros::millis();
