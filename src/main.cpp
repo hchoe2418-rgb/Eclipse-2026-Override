@@ -23,9 +23,7 @@ ez::Drive chassis(
 // ez::tracking_wheel horiz_tracker(8, 2.75, 4.0);  // This tracking wheel is perpendicular to the drive wheels
 // ez::tracking_wheel vert_tracker(9, 2.75, 4.0);   // This tracking wheel is parallel to the drive wheels
 
-//pros::MotorGroup lift ({10, -9});
-pros::Motor lift1(10);
-pros::Motor lift2(-9);
+pros::MotorGroup lift ({10, -9});
 pros::adi::DigitalOut claw('A');
 
 
@@ -312,16 +310,19 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
-      lift1.move(-100);
-      lift2.move(-100);
+      lift.move(-100);
+      //lift1.move(-100);
+      //lift2.move(-100);
     }
     else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-      lift1.move(100);
-      lift2.move(100);
+      lift.move(100);
+      //lift1.move(100);
+      //lift2.move(100);
     }
     else {
-      lift1.move(0);
-      lift2.move(0);
+      lift.move(0);
+      //lift1.move(0);
+      //lift2.move(0);
     }
 
 
