@@ -321,9 +321,7 @@ void opcontrol() {
     }
     else {
       lift1.move(0);
-      lift1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
       lift2.move(0);
-      lift2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     }
 
 
