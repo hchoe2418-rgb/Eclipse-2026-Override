@@ -8,7 +8,7 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-9,-11},// Left Chassis Ports (negative port will reverse it!)
+    {-8,-11},// Left Chassis Ports (negative port will reverse it!)
     {7, 3},  // Right Chassis Ports (negative port will reverse it!)
 
     1,      // IMU Port
@@ -330,7 +330,6 @@ void opcontrol() {
       claw.set_value(claw_open);
     }
 
-    pros::delay(20);
 
     /*
     //1 minute and 45 seconds total = 105,000 milliseconds
