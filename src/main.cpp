@@ -26,7 +26,6 @@ ez::Drive chassis(
 pros::MotorGroup lift ({10, -9});
 pros::adi::DigitalOut claw('B', false);
 
-
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -310,12 +309,12 @@ void opcontrol() {
     // . . .
     // Put more user control code here!
     // . . .
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
       lift.move(-100);
       //lift1.move(-100);
       //lift2.move(-100);
     }
-    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
       lift.move(100);
       //lift1.move(100);
       //lift2.move(100);
@@ -346,112 +345,3 @@ void opcontrol() {
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
 }
-
-/*
-Macro idea from AI (I think it's ok)
-
-enum MacroState { IDLE, DEPOSITING, RELEASING, RESETTING };
-MacroState current_macro_state = IDLE;
-
-// Global tracker for stack layers (0 = Floor, 1 = Layer One, 2 = Layer Two, etc.)
-int stack_layer = 0; 
-
-// Lookup array or formula for your arm encoder targets per layer
-// Adjust these numbers based on physical testing with Override Pins/Cups
-const int LAYER_HEIGHTS[] = { 150, 300, 450, 600, 750 }; 
-const int MAX_LAYERS = 5;
-
-
-void dynamic_macro_task(void* param) {
-    uint32_t start_time = pros::millis();
-    bool command_sent = false; // Prevents motor command spamming
-    
-    while (true) {
-        int dynamic_target = LAYER_HEIGHTS[stack_layer];
-
-        switch (current_macro_state) {
-            case IDLE:
-                command_sent = false; // Reset toggle for next launch
-                break;
-                
-            case DEPOSITING:
-                // Send the move command EXACTLY ONCE when entering this state
-                if (!command_sent) {
-                    arm_motor.move_absolute(dynamic_target, 100);
-                    command_sent = true; 
-                }
-                
-                // Keep checking the encoder until it reaches the target window
-                if (std::abs(arm_motor.get_position() - dynamic_target) < 10) {
-                    start_time = pros::millis(); // Reset timer for pneumatic delay
-                    command_sent = false;        // Reset toggle for next state
-                    current_macro_state = RELEASING;
-                }
-                break;
-                
-            case RELEASING:
-                claw_pneumatic.set_value(true);
-                
-                // Wait 150ms for air pressure to clear the physical stack
-                if (pros::millis() - start_time > 150) {
-                    current_macro_state = RESETTING;
-                }
-                break;
-                
-            case RESETTING:
-                if (!command_sent) {
-                    int clear_height = dynamic_target + 80; // Small upward pop
-                    arm_motor.move_absolute(clear_height, 100);
-                    command_sent = true;
-                }
-                
-                int clear_height = dynamic_target + 80;
-                if (std::abs(arm_motor.get_position() - clear_height) < 15) {
-                    claw_pneumatic.set_value(false); // Close claw for next intake
-                    
-                    // Auto-increment to the next stack layer list index
-                    if (stack_layer < MAX_LAYERS - 1) {
-                        stack_layer++; 
-                    }
-                    
-                    current_macro_state = IDLE; // Successfully completed!
-                }
-                break;
-        }
-        pros::delay(20); // Safeguards the processor from locking up
-    }
-}    
-
-void opcontrol() {
-    while (true) {
-        // Standard EZ-Template drive setup
-        chassis.set_tank(master.get_analog(ANALOG_LEFT_Y), master.get_analog(ANALOG_RIGHT_Y));
-
-        // TRIGGER THE MACRO
-        if (master.get_digital_new_press(DIGITAL_R1) && current_macro_state == IDLE) {
-            current_macro_state = DEPOSITING;
-        }
-
-        // MANUAL HEIGHT ADJUSTMENT (Overriding the auto-increment)
-        if (master.get_digital_new_press(DIGITAL_UP)) {
-            if (stack_layer < MAX_LAYERS - 1) stack_layer++;
-            master.rumble("."); // Give physical vibration feedback to the driver
-        }
-        if (master.get_digital_new_press(DIGITAL_DOWN)) {
-            if (stack_layer > 0) stack_layer--;
-            master.rumble("-"); // Different rumble pattern for down
-        }
-        
-        // RESET BUTTON (If you back away and start a completely new stack on the floor)
-        if (master.get_digital_new_press(DIGITAL_X)) {
-            stack_layer = 0;
-            arm_motor.move_absolute(0, 90); // Bring arm back to zero
-        }
-
-        // Standard driver manual arm overrides go here...
-        pros::delay(EZ_TEMPLATE_LOOP_DELAY);
-    }
-}
-
-
-*/
