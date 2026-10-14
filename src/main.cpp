@@ -8,8 +8,8 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-8,-11},// Left Chassis Ports (negative port will reverse it!)
-    {7, 3},  // Right Chassis Ports (negative port will reverse it!)
+    {-18,-19, -20},// Left Chassis Ports (negative port will reverse it!)
+    {7, 8, 9},  // Right Chassis Ports (negative port will reverse it!)
 
     1,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
@@ -23,8 +23,9 @@ ez::Drive chassis(
 // ez::tracking_wheel horiz_tracker(8, 2.75, 4.0);  // This tracking wheel is perpendicular to the drive wheels
 // ez::tracking_wheel vert_tracker(9, 2.75, 4.0);   // This tracking wheel is parallel to the drive wheels
 
-pros::MotorGroup lift ({10, -9});
+pros::Motor lift(6);
 pros::adi::DigitalOut claw('B', false);
+pros::Rotation lift_sensor(4);
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -275,7 +276,7 @@ void opcontrol() {
 
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
   uint32_t start_time = pros::millis();
-  
+  lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   
   chassis.opcontrol_joystick_practicemode_toggle(false);
   chassis.pid_tuner_enable();
@@ -311,18 +312,12 @@ void opcontrol() {
     // . . .
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
       lift.move(-100);
-      //lift1.move(-100);
-      //lift2.move(-100);
     }
     else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
       lift.move(100);
-      //lift1.move(100);
-      //lift2.move(100);
     }
     else {
-      lift.move(0);
-      //lift1.move(0);
-      //lift2.move(0);
+      lift.move(-20);
     }
 
 

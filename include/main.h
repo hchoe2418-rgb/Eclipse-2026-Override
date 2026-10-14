@@ -88,3 +88,13 @@ void opcontrol(void);
 #endif
 
 #endif  // _PROS_MAIN_H_
+
+extern ez::Drive chassis; 
+extern pros::Motor lift;
+extern pros::adi::DigitalOut claw;
+extern pros::Rotation lift_sensor;
+
+extern int LIFT_LOW;
+extern int LIFT_MID;
+extern int LIFT_HIGH;
+

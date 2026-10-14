@@ -1,4 +1,5 @@
 #include "main.h"
+#include "helpers.hpp"
 
 /////
 // For installation, upgrading, documentations, and tutorials, check out our website!
